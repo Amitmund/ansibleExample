@@ -1,0 +1,34 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+
+  - name: installing apache
+    yum: state=present name=httpd
+
+  - name: updating http.conf file
+    template: src=templates/httpd.conf.j2 dest=/etc/httpd/conf/httpd.conf owner=root mode=0644 force=yes
+    notify: restart_httpd
+
+  - name: creating supported directory
+    file: path=/var/www/wordpress_8005 state=directory
+
+  - name: creating another suported directory
+    file: path=/var/www/wordpress_8006 state=directory
+
+  - name: creating test.php for wordpress_8005
+    template: src=templates/test.php.j2 dest=/var/www/wordpress_8005/test.php owner=root mode=0644 force=yes
+
+  - name: creating test.php for wordpress_8006
+    template: src=templates/test.php.j2 dest=/var/www/wordpress_8006/test.php owner=root mode=0644 force=yes
+
+  - name: Start apache services and enable on boot
+    service: name=httpd state=started enabled=yes
+
+  handlers: 
+    - name: restart_httpd
+      service: name=httpd state=restarted
+  

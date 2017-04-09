@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+
+  - name: installing apache
+    yum: name=haproxy state=present
+
+  - name: updating haproxy file
+    template: src=templates/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg owner=root mode=0644 force=yes
+    notify: restart_haproxy
+
+  - name: Start apache services and enable on boot
+    service: name=haproxy state=started enabled=yes
+
+  handlers: 
+    - name: restart_haproxy
+      service: name=haproxy state=restarted
+  

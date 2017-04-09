@@ -1,0 +1,31 @@
+global
+    maxconn 100000
+    uid 99
+    gid 99
+    daemon
+
+
+defaults http
+    option forwardfor except 127.0.0.1
+    option http-server-close
+    timeout connect 5s
+    timeout client 30s
+    timeout client-fin 30s
+    timeout server 30s
+    timeout tunnel  1h
+
+listen  myWeb 0.0.0.0:80
+    mode http
+    balance source
+    option forwardfor
+    option http-server-close
+    stats enable
+    stats refresh 10s
+    stats hide-version
+    stats scope   .
+    stats uri     /lb?stats
+    stats realm   LB2\ Statistics
+    stats auth admin:passwd
+
+    server  S1 127.0.0.1:8005 check inter 2000 fall 3
+    server  S2 127.0.0.1:8006 check inter 2000 fall 3

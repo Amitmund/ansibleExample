@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+
+  - name: install mysql with blank root password
+    yum: state=present name={{ item }}
+    with_items:
+      - mysql
+      - mysql-server
+      - MySQL-python
+      - libselinux-python
+
+  - name: Start mysql services and enable on boot
+    service: state=started enabled=yes name=mysqld

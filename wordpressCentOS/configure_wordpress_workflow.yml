@@ -1,0 +1,17 @@
+---
+- name: Playing downstream
+  hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+  - name: including other playbook
+    ping:
+
+- include: mysql_installation_with_yum.yml
+- include: php_related_yum.yml
+- include: apache_installation_with_yum.yml
+- include: mysql_user_creation.yml
+- include: configuring_wordpress.yml
+- include: haproxy_yum.yml

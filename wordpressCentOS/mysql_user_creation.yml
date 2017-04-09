@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+
+  - name: creating mysql user.
+    mysql_user:
+      login_user: root
+      login_password: ''
+      name: wordpress
+      password: abc123
+      priv: '*.*:ALL'
+      state: present
+
+  - name: Create a 'wordpress' database
+    mysql_db:
+      login_user: root
+      login_password: ''
+      name: wordpress
+      state: present
+      encoding: utf8

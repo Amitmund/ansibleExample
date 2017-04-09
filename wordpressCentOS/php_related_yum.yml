@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  gather_facts: yes
+
+  tasks:
+
+  - name: installing php related stuffs.
+    yum: state=present name={{ item }}
+    with_items:
+    - php-gd
+    - php-mysql
+    - mod_ssl
+    - php

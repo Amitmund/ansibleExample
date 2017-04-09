@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+
+  tasks:
+
+  - name: Download latest wordpress 
+    get_url: 
+      url: http://wordpress.org/latest.tar.gz
+      dest: /root/wordpress.tar.gz
+
+  - name: extracting the first instance
+    command: tar -zxvf /root/wordpress.tar.gz -C /var/www/wordpress_8005 --strip-components=1
+
+  - name: extracting the second instance
+    command: tar -zxvf /root/wordpress.tar.gz -C /var/www/wordpress_8006 --strip-components=1
+
+  - name: creating test.php for wordpress_8005
+    template: src=templates/wp-config.php.j2 dest=/var/www/wordpress_8005/wp-config.php owner=root mode=0644 force=yes
+
+  - name: creating test.php for wordpress_8006
+    template: src=templates/wp-config.php.j2 dest=/var/www/wordpress_8006/wp-config.php owner=root mode=0644 force=yes
