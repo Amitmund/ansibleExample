@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+
+  tasks:
+
+#  - name: Download kafka 
+#    get_url: 
+#      url: http://apache.claz.org/kafka/0.10.2.0/kafka_2.12-0.10.2.0.tgz
+#      dest: /tmp/kafka_2.12-0.10.2.0.tgz
+
+  - name: copying kafka
+    copy: src=files/kafka_2.12-0.10.2.0.tgz dest=/tmp/kafka_2.12-0.10.2.0.tgz
+
+  - name: creating /usr/bin/kafka directory
+    file:
+      path: /usr/bin/kafka
+      state: directory
+      mode: 0755
+
+  - name: extracting the first instance
+    command: tar -zxvf /tmp/kafka_2.12-0.10.2.0.tgz -C /usr/bin/kafka --strip-components=1
