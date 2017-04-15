@@ -1,0 +1,66 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+
+  tasks:
+
+  - name: copying java
+    copy: src=files/jdk-8u121-linux-x64.tar.gz dest=/tmp/jdk-8u121-linux-x64.tar.gz
+
+
+# create a directory if it doesn't exist
+  - name: creating /usr/bin/java directory
+    file:
+      path: /usr/bin/java
+      state: directory
+      mode: 0755
+
+  - name: extracting the first instance
+    command: tar -zxvf /tmp/jdk-8u121-linux-x64.tar.gz -C /usr/bin/java --strip-components=1
+
+#  - name: updating /etc/environment only if not there
+#    lineinfile:
+#      dest: /etc/environment
+#      line: export JAVA_HOME=/usr/bin/java/
+#
+#  - name: updating the /etc/environment only if not there
+#    lineinfile:
+#      dest: /etc/environment
+#      line: export PATH=$PATH:$JAVA_HOME/bin
+#
+  - name: updating the /home/ubuntu/.bashrc only if not there
+    lineinfile:
+      dest: /home/ubuntu/.bashrc
+      line: export JAVA_HOME=/usr/bin/java/
+
+  - name: updating the /root/.bashrc only if not there
+    lineinfile:
+      dest: /root/.bashrc
+      line: export JAVA_HOME=/usr/bin/java/
+
+  - name: updating the /home/ubuntu/.bashrc only if not there
+    lineinfile:
+      dest: /home/ubuntu/.bashrc
+      line: export PATH=$JAVA_HOME/bin:$PATH
+
+  - name: updating the /root/.bashrc only if not there
+    lineinfile:
+      dest: /root/.bashrc
+      line: export PATH=$JAVA_HOME/bin:$PATH
+
+  - name: update /home/ubuntu/.bashrc file
+    lineinfile: 
+      dest: /home/ubuntu/.bashrc
+      regexp: EOF
+      insertafter: EOF
+      line: export JAVA_HOME=/usr/bin/java/
+      state: present
+
+  - name: update /home/ubuntu/.bashrc file
+    lineinfile: 
+      dest: /home/ubuntu/.bashrc
+      regexp: EOF
+      insertafter: EOF
+      line: export PATH=$JAVA_HOME/bin:$PATH
+      state: present
