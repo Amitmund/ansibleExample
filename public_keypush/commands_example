@@ -1,0 +1,2 @@
+ ansible-playbook -i inventory.ini --limit vm1 deploy_keys.yml --ask-pass --extra-vars='pubkey="hohoho.pub"' --extra-vars='username="amund"'
+ ansible-playbook -i <inventory-file> deploy_authorized_keys.yml --ask-become-pass --ask-pass --extra-vars='pubkey="<pubkey-for-super-user>"'
