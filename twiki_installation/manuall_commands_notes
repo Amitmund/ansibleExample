@@ -1,0 +1,341 @@
+
+
+#########################################################################
+# Twiki installation quick notes.
+http://www.twiki.org/p/pub/TWiki/TWikiInstallationGuide/twiki-install-centos.txt
+#########################################################################
+
+# Download the TWiki gz file.
+wget https://downloads.sourceforge.net/project/twiki/TWiki%20for%20all%20Platforms/TWiki-6.0.2/TWiki-6.0.2.tgz
+ 
+yum update
+yum install wget
+yum install perl
+yum install rcs
+yum install zip
+yum install httpd
+yum install make
+yum install gcc
+yum install gd
+yum install gd-devel
+yum install php
+
+vi /etc/sysconfig/iptables
+  ... add the following lines after "-A INPUT ... dport 22 ...":
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 443 -j ACCEPT
+
+/etc/init.d/iptables restart
+chkconfig --level 2345 httpd on
+
+3. Install Perl modules for TWiki
+
+3.1 First some modules with yum
+
+yum install perl-CPAN
+yum install perl-CGI
+yum install perl-YAML
+yum install perl-IPC-Cmd
+yum install perl-Module-CoreList
+yum install perl-ExtUtils-CBuilder
+yum install perl-Module-Build
+
+3.2 Then from CPAN to get the latest and the rest
+
+perl -MCPAN -e shell
+  install Term::ReadKey
+  install Bundle::CPAN
+  reload cpan
+  install Encode
+  install Error
+  install HTML::Parser
+  install Text::Diff
+  install Time::Local
+  install Authen::SASL
+  install CGI::Session
+  install Digest::SHA1
+  install Locale::Maketext::Lexicon
+  install URI
+  install FreezeThaw
+  install GD
+  install HTML::Tree
+  install Time::Timezone
+
+4. Download and install TWiki
+
+###
+cd /var/www/html
+wget http://freefr.dl.sourceforge.net/project/twiki/TWiki%20for%20all%20Platforms/TWiki-5.1.1/TWiki-5.1.1.tgz
+tar xvfz TWiki-5.1.1.tgz 
+chown -R apache:apache twiki
+
+cp twiki/bin/LocalLib.cfg.txt twiki/bin/LocalLib.cfg
+chown apache:apache twiki/bin/LocalLib.cfg
+
+5. Basic TWiki configuration
+
+vi twiki/bin/LocalLib.cfg
+  ... set $twikiLibPath = "/var/www/html/twiki/lib";
+
+cp twiki/twiki_httpd_conf.txt /etc/httpd/conf.d/twiki_httpd.conf
+
+... I'm using username "root" for access control
+
+cd twiki/data
+htpasswd -c .htpasswd root
+  set password
+
+vi /etc/httpd/conf.d/twiki_httpd.conf
+  :%s_/home/httpd_/var/www/html_g
+  :%s/JohnDoe/root/g
+  ... go to section starting "<FilesMatch "^configure.*">"
+  ... replace "Allow from 127.0.0.1 192.168.1.10" if you run configure from another address
+  ... for example "Allow from all"
+
+/etc/init.d/httpd restart
+
+6. Continue with web based configuration as per documentation
+
+--> http://192.168.243.101/twiki/bin/configure
+
+
+
+#######
+
+#########################################################################
+# Other notes
+https://www.unixmen.com/install-twiki-collaboration-platform-centos-6-5/
+#########################################################################
+
+
+Operating System: CentOS 6.5 32bit Edition Minimal installation
+IP Address: 192.168.1.2/24
+Hostname: server.unixmen.local
+SELinux: Enabled
+Firewall(iptables): Enabled
+Apache webserver default port 80 is allowed through IP tables.
+
+
+yum install wget perl rcs zip httpd make gcc gd gd-devel php
+
+vi /etc/sysconfig/iptables
+
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 443 -j ACCEPT
+
+Save and close the file. Restart iptables service.
+
+service iptables restart
+Install Perl Modules
+
+Install the following perl modules.
+
+yum install perl-CPAN perl-CGI perl-YAML perl-IPC-Cmd perl-Module-CoreList perl-ExtUtils-CBuilder perl-Module-Build
+Now, Log in to CPAN, and enter the following command one by one to get latest updates.
+
+First, Log in to CPAN using command:
+
+perl -MCPAN -e shell
+The CPAN shell will look like below.
+
+cpan[1]>
+Then, enter the following commands one by one from the CPAN shell to update and get all latest and rest of the modules. Be mindful that, the following are separate commands. Enter the commands one by one, and go with the default answers. Do not change or modify anything unless you know what are you doing. It will take some time to download and install all modules. Be patient, and hit enter to go with default answers.
+
+  install Term::ReadKey
+  install Bundle::CPAN
+  reload cpan
+  install Encode
+  install Error
+  install HTML::Parser
+  install Text::Diff
+  install Time::Local
+  install Authen::SASL
+  install CGI::Session
+  install Digest::SHA1
+  install Locale::Maketext::Lexicon
+  install URI
+  install FreezeThaw
+  install GD
+  install HTML::Tree
+  install Time::Timezone
+After executing all commands, type exit to return back to Terminal.
+
+Download and install Twiki
+
+Once you did all the above steps successfully, download the latest version from the Twiki website.
+
+Create a folder called twiki on apache root folder.
+
+mkdir /var/www/html/twiki
+Go to the twki folder, and download the latest TWiki version:
+
+cd /var/www/html/twiki
+wget http://sourceforge.net/projects/twiki/files/TWiki%20for%20all%20Platforms/TWiki-6.0.0/TWiki-6.0.0.zip
+Unzip the file,  and set the ownership to apache user over twiki folder.
+
+unzip TWiki-6.0.0.zip
+chown -R apache:apache /var/www/html/twiki/
+Configure Twiki
+
+Rename the file LocalLib.cfg.txt file to LocalLib.cfg, and set the ownership.
+
+cp /var/www/html/twiki/bin/LocalLib.cfg.txt /var/www/html/twiki/bin/LocalLib.cfg
+chown apache:apache /var/www/html/twiki/bin/LocalLib.cfg
+Edit file LocalLib.cfg,
+
+vi /var/www/html/twiki/bin/LocalLib.cfg
+Find the line twikiLibPath, and set the path of twki/lib folder.
+
+[...]
+$twikiLibPath = "/var/www/html/twiki/lib";
+[...]
+Make sure you’ve given the right path of the twiki/lib folder.
+
+Copy file twiki_httpd_conf.txt as twiki_httpd.conf to /etc/httpd/conf.d/.
+
+cp /var/www/html/twiki/twiki_httpd_conf.txt /etc/httpd/conf.d/twiki_httpd.conf
+Go to the twki/data folder and set the password for ‘root’ user.
+
+cd /var/www/html/twiki/data/
+htpasswd -c .htpasswd root
+Edit file twiki_httpd.conf,
+
+vi /etc/httpd/conf.d/twiki_httpd.conf
+Find the line /home/httpd/ and change it to /var/www/html/. To change all at once, enter the following command in the vi editor.
+
+:%s_/home/httpd_/var/www/html_g
+Find the line JohnDoe and change it to root. You can change it using the following command from your vi editor.
+
+:%s/JohnDoe/root/g
+If you want to let any IP address can access the twiki configuration URL, Go to the section <Directory “/var/www/html/twiki/bin”>, and make sure the line “Allow from All” is exists. If the line looks like Allow from none, then change it to Allow from All.
+
+After the modifications, save and close the file. Restart apache service.
+
+service httpd restart
+Begin Installation
+
+### For the further screen-shot ###
+Open up your browser, and enter the  URL http://ip-address/twiki/bin/configure, and follow the onscreen instructions.
+
+https://www.unixmen.com/install-twiki-collaboration-platform-centos-6-5/
+
+
+
+
+############# 3rd Blog notes ###############
+https://www.rosehosting.com/blog/install-twiki-on-a-centos-7-vps/
+
+ssh root@IP
+yum -y update
+yum install wget perl unzip rcs gcc make gd gd-devel php
+yum install httpd
+systemctl start httpd
+systemctl enable httpd
+
+#We also need to install several Perl modules
+
+yum install perl-CPAN perl-ExtUtils-CBuilder perl-YAML perl-Module-CoreList  perl-CGI perl-Module-Build perl-IPC-Cmd
+
+
+perl -MCPAN -e shell
+Install TWiki on a CentOS 7 VPS
+NOVEMBER 10, 20151TUTORIALS
+
+ 
+T-logo-169x130-t
+
+
+ In this article we will install TWiki on a CentOS 7 VPS with Apache web server. TWiki is simple to use, flexible, secure and very powerful web-based collaboration platform based on Perl. Using TWiki you can run a project development space, a document management system, a knowledge base or any other groupware tool. TWiki is used by millions of users in more than 130 countries in the world and it comes with many features such as:
+Easy Table editing
+Skinnable user interface
+Rich Text Editor
+Over 400 extensions and 200 plugins
+Fine-grained access control
+Revision controln
+Dynamic content generation
+Forms and reporting
+And many more…
+
+Log in to your CentOS 7 machine via SSH as user root
+
+ssh root@IP
+and update all services to your server
+
+yum -y update
+Install some prerequisites needed to install TWiki .
+
+yum install wget perl unzip rcs gcc make gd gd-devel php
+Execute the following command to install Apache web server.
+
+yum install httpd
+Start the Apache web server and add it to automatically start on the system start-up
+
+systemctl start httpd
+systemctl enable httpd
+We also need to install several Perl modules
+
+yum install perl-CPAN perl-ExtUtils-CBuilder perl-YAML perl-Module-CoreList  perl-CGI perl-Module-Build perl-IPC-Cmd
+We will install the rest of the Perl modules from CPAN. Start CPAN’s shell by executing the following
+
+perl -MCPAN -e shell
+and install the following modules one by one
+
+install Term::ReadKey
+install Bundle::CPAN
+reload cpan
+install CGI::Carp
+install Cwd
+install LWP
+install Encode
+install HTML::Parser
+install Error
+install Time::Local
+install Text::Diff
+install Authen::SASL
+install CGI::Session
+install Digest::SHA1
+install URI
+install Locale::Maketext::Lexicon
+install FreezeThaw
+install GD
+install HTML::Tree
+install Time::Timezone
+
+##
+
+wget http://downloads.sourceforge.net/project/twiki/TWiki%20for%20all%20Platforms/TWiki-6.0.1/TWiki-6.0.1.zip
+
+#
+mkdir  /var/www/html/twiki
+unzip TWiki-6.0.1.zip -d /var/www/html/twiki
+
+chown -R apache:apache /var/www/html/twiki
+
+Now we need to configure TWiki. Rename the ‘LocalLib.cfg.txt’ file/
+
+cd /var/www/html/twiki
+mv bin/LocalLib.cfg.txt bin/LocalLib.cfg
+Open the configuration file and set the path of the lib directory in TWiki’s installation
+
+vim bin/LocalLib.cfg
+
+$twikiLibPath = "/var/www/html/twiki/lib";
+Copy the Apache configuration file provided by TWiki
+
+cp misc/twiki_httpd_conf.txt /etc/httpd/conf.d/twiki.conf
+Open the configuration and change all instances of ‘/home/httpd/’ to ‘/var/www/html’. If you are using vi text editor you can use the following command
+
+:%s_/home/httpd_/var/www/html_g
+Also insert ‘root’ as username at the ‘AuthName’ file in the same file.
+
+Protect the data directory to be accessible with username and password
+
+cd data/
+htpasswd -c .htpasswd root
+New password:
+Re-type new password:
+Adding password for user root
+Restart the Apache web server
+
+systemctl restart httpd
+Now, open a web browser and navigate to http://yourIPaddress/twiki/bin/configure and follow the instructions to continue with the web based installation
